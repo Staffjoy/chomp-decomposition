@@ -11,4 +11,5 @@ env:
     - PYTHONPATH="$TRAVIS_BUILD_DIR"
 install:
     - cd build && bash ubuntu-install.sh && cd ..
+    - pip install -I -r requirements.txt
 script: make test
