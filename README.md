@@ -4,9 +4,16 @@
 
 [![Build Status](https://travis-ci.org/Staffjoy/chomp-decomposition.svg?branch=master)](https://travis-ci.org/Staffjoy/chomp-decomposition) [![Moonlight](https://img.shields.io/badge/contractors-1-brightgreen.svg)](https://moonlightwork.com/staffjoy) [![Docker Automated build](https://img.shields.io/docker/automated/jrottenberg/ffmpeg.svg)](https://hub.docker.com/r/staffjoy/chomp-decomposition/)
 
-[Staffjoy is shutting down](https://blog.staffjoy.com/staffjoy-is-shutting-down-39f7b5d66ef6#.ldsdqb1kp), so we are open-sourcing our code. Chomp is an applied mathematics microservice for decomposing hourly demand into shifts of variable length. It uses techniques from [branch and bound algorithms](https://en.wikipedia.org/wiki/Branch_and_bound), and adds in subproblem generation, preprocessing techniques, feasibility detection, heuristics, and caching. [Learn more in the Chomp launch blog post.](https://blog.staffjoy.com/introducing-chomp-computing-shifts-from-forecasts-21315f46aadc#.xa306ltre)
+[Staffjoy is shutting down](https://blog.staffjoy.com/staffjoy-is-shutting-down-39f7b5d66ef6#.ldsdqb1kp), so we are open-sourcing our code. Chomp is an applied mathematics microservice for decomposing hourly demand into shifts of variable length. This repo was intended to be a proof of concept. It worked so well in production that we never rewrote it. My intention was to rewrite it into a more parallel language, such as Go, in order to take advantage of multiple cores. It served production traffic from June 2016 to March 2017 with zero modification or production errors.
 
-This repo was intended to be a proof of concept. It worked so well in production that we never rewrote it. My intention was to rewrite it into a more parallel language, such as Go, in order to take advantage of multiple cores. It served production traffic from June 2016 to March 2017 with zero modification or production errors.
+## Algorithm
+
+![Chomp converts forecasts to shifts](https://i.imgur.com/i8enKgO.png)
+
+Chomp solves a type of packing problem similar to a [bin packing problem](https://en.wikipedia.org/wiki/Bin_packing_problem). It tries to tessellate when shifts start and how long they last in order to best match staffing levels to forecasts. It does this subject to the minimum and maximum shift length.
+
+Chomp uses techniques from [branch and bound algorithms](https://en.wikipedia.org/wiki/Branch_and_bound), and adds in subproblem generation, preprocessing techniques, feasibility detection, heuristics, and caching. [Learn more in the Chomp launch blog post.](https://blog.staffjoy.com/introducing-chomp-computing-shifts-from-forecasts-21315f46aadc#.xa306ltre)
+
 
 ## Credit
 
@@ -16,7 +23,6 @@ This repository was conceived and authored in its entirety by [@philipithomas](h
 
 You can install Chomp locally with `pip install --upgrade chomp`. Or, use the [docker image](https://hub.docker.com/r/staffjoy/chomp-decomposition/) to interface Chomp with [Staffjoy Suite](https://github.com/staffjoy/suite). 
 
-Chomp solves a type of packing problem similar to a [bin packing problem](https://en.wikipedia.org/wiki/Bin_packing_problem). It tries to tessalate when shifts start and how long they last in order to best match staffing levels to forecasts. It does this subject to the minimum and maximum shift length.
 
 Chomp was designed to handle one week of scheduling at an hourly granularity. However, the package is unitless and hypothetically support weeks of any length of time at any granularity.
 
