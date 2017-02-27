@@ -14,7 +14,7 @@ This repository was conceived and authored in its entirety by [@philipithomas](h
 
 ## Usage
 
-You can install Chomp locally with `pip install -u chomp`. Or, use the [docker image](https://hub.docker.com/r/staffjoy/chomp-decomposition/) to interface Chomp with [Staffjoy Suite](https://github.com/staffjoy/suite). 
+You can install Chomp locally with `pip install --upgrade chomp`. Or, use the [docker image](https://hub.docker.com/r/staffjoy/chomp-decomposition/) to interface Chomp with [Staffjoy Suite](https://github.com/staffjoy/suite). 
 
 Chomp solves a type of packing problem similar to a [bin packing problem](https://en.wikipedia.org/wiki/Bin_packing_problem). It tries to tessalate when shifts start and how long they last in order to best match staffing levels to forecasts. It does this subject to the minimum and maximum shift length.
 
