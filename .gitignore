@@ -1,0 +1,8 @@
+*.pyc
+.DS_Store
+.vagrant/
+*.log
+vagrant-venv/
+.cache/
+*.swp
+*.prm
