@@ -6,9 +6,11 @@
 
 [Staffjoy is shutting down](https://blog.staffjoy.com/staffjoy-is-shutting-down-39f7b5d66ef6#.ldsdqb1kp), so we are open-sourcing our code. Chomp is an applied mathematics microservice for decomposing hourly demand into shifts of variable length. It uses techniques from [branch and bound algorithms](https://en.wikipedia.org/wiki/Branch_and_bound), and adds in subproblem generation, preprocessing techniques, feasibility detection, heuristics, and caching. 
 
+This repo was intended to be a proof of concept. It worked so well in production that we never rewrote it. My intention was to rewrite it into a more parallel language, such as Go, in order to take advantage of multiple cores. It served production traffic from June 2016 to March 2017 with zero modification or production errors.
+
 ## Credit
 
-This repository was authored in its entirety by [@philipithomas](https://github.com/philipithomas). This is a fork of the internal repository. For security purposes, the Git history has been squashed.
+This repository was conceived and authored in its entirety by [@philipithomas](https://github.com/philipithomas). This is a fork of the internal repository. For security purposes, the Git history has been squashed and client names have been scrubbed from tests. (Whenever there was a production issue, we added a functional test to the repo.)
 
 ### Environment Variables
 
