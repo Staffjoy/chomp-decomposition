@@ -6,6 +6,10 @@
 
 [Staffjoy is shutting down](https://blog.staffjoy.com/staffjoy-is-shutting-down-39f7b5d66ef6#.ldsdqb1kp), so we are open-sourcing our code. Chomp is an applied mathematics microservice for decomposing hourly demand into shifts of variable length. This repo was intended to be a proof of concept. It worked so well in production that we never rewrote it. My intention was to rewrite it into a more parallel language, such as Go, in order to take advantage of multiple cores. It served production traffic from June 2016 to March 2017 with zero modification or production errors.
 
+## Self-Hosting
+
+If you are self-hosting Chomp, please make sure that you are using version `>=0.24` of the `staffoy` client (in `requirements.txt`). Then, modify `chomp/tasking.py` to include your custom domain - when initializing `Client()`, pass in your custom URL base, e.g. `Client(url_base="https://staffjoy.example.com/api/v2/, key=config.STAFFJOY_API_KEY, env=config.ENV)`,
+
 ## Algorithm
 
 ![Chomp converts forecasts to shifts](https://i.imgur.com/i8enKgO.png)

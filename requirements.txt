@@ -21,6 +21,6 @@ python-memcached==1.58
 pytz==2016.4
 requests==2.10.0
 six==1.10.0
-staffjoy==0.23
+staffjoy==0.24
 wrapt==1.10.8
 yapf==0.16.0
