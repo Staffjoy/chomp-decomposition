@@ -2,7 +2,7 @@
 
 # Chomp - Service for computing shifts from forecasts
 
-[![Build Status](https://travis-ci.org/Staffjoy/chomp-decomposition.svg?branch=master)](https://travis-ci.org/Staffjoy/chomp-decomposition) [![Moonlight contractors](https://img.shields.io/badge/contractors-1147-brightgreen.svg)](https://moonlightwork.com/for/staffjoy) [![Docker Automated build](https://img.shields.io/docker/automated/jrottenberg/ffmpeg.svg)](https://hub.docker.com/r/staffjoy/chomp-decomposition/) [![PyPI version](https://badge.fury.io/py/chomp.svg)](https://badge.fury.io/py/chomp)
+[![Build Status](https://travis-ci.org/Staffjoy/chomp-decomposition.svg?branch=master)](https://travis-ci.org/Staffjoy/chomp-decomposition) [![Moonlight contractors](https://www.moonlightwork.com/shields/python.svg)](https://www.moonlightwork.com/for/python?referredByUserID=1&referralProgram=maintainer&referrerName=Staffjoy) [![Docker Automated build](https://img.shields.io/docker/automated/jrottenberg/ffmpeg.svg)](https://hub.docker.com/r/staffjoy/chomp-decomposition/) [![PyPI version](https://badge.fury.io/py/chomp.svg)](https://badge.fury.io/py/chomp)
 
 [Staffjoy is shutting down](https://blog.staffjoy.com/staffjoy-is-shutting-down-39f7b5d66ef6#.ldsdqb1kp), so we are open-sourcing our code. Chomp is an applied mathematics microservice for decomposing hourly demand into shifts of variable length. This repo was intended to be a proof of concept. It worked so well in production that we never rewrote it. My intention was to rewrite it into a more parallel language, such as Go, in order to take advantage of multiple cores. It served production traffic from June 2016 to March 2017 with zero modification or production errors.
 
