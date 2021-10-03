@@ -1,11 +1,16 @@
 DAYS_OF_WEEK = [
-    "monday", "tuesday", "wednesday", "thursday", "friday", "saturday",
-    "sunday"
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday",
 ]
 
 
 def week_day_range(start_day="monday"):
-    """ Return list of days of week in order from start day """
+    """Return list of days of week in order from start day"""
     start_index = DAYS_OF_WEEK.index(start_day)
     return DAYS_OF_WEEK[start_index:] + DAYS_OF_WEEK[:start_index]
 

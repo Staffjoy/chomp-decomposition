@@ -3,7 +3,7 @@ import json
 import hashlib
 
 
-class Cache():
+class Cache:
     """Subproblem caching"""
 
     def __init__(self, config, logger):
@@ -32,7 +32,6 @@ class Cache():
     def _subproblem_to_key(subproblem):
         """Convert a subproblem into a memcached key"""
         # Cannot just use straight json because it has spaces,
-        # which memcache does not support. Hash is repeatable and 
+        # which memcache does not support. Hash is repeatable and
         # also make sure we stay under the memcache key length limit
-        return hashlib.sha256(
-            json.dumps(subproblem, sort_keys=True)).hexdigest()
+        return hashlib.sha256(json.dumps(subproblem, sort_keys=True).encode('utf-8')).hexdigest()

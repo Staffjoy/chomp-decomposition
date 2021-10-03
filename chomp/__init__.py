@@ -41,8 +41,9 @@ else:
     handler = logging.StreamHandler(sys.stdout)
 
 formatter = logging.Formatter(
-    '%(asctime)s %(hostname)s chomp %(levelname)s %(message)s',
-    datefmt='%Y-%m-%dT%H:%M:%S')
+    "%(asctime)s %(hostname)s chomp %(levelname)s %(message)s",
+    datefmt="%Y-%m-%dT%H:%M:%S",
+)
 handler.setFormatter(formatter)
 handler.setLevel(config.LOG_LEVEL)
 logger.addHandler(handler)

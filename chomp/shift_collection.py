@@ -40,7 +40,10 @@ class ShiftCollection(object):
         if start < 0 or end_index > self.demand_length:
             raise Exception(
                 "Shift lies outside demand bounds (demand length %s, shift start %s, shift end %s,",
-                self.demand_length, start, end_index)
+                self.demand_length,
+                start,
+                end_index,
+            )
 
         for t in range(start, end_index):
             self._coverage[t] += 1
@@ -89,8 +92,10 @@ class ShiftCollection(object):
             if self._demand[t] > self._coverage[t]:
                 return t
 
-        raise Exception("Infeasible answer- demand is met %s %s %s" %
-                        (self.demand_is_met, self._demand, self._coverage))
+        raise Exception(
+            "Infeasible answer- demand is met %s %s %s"
+            % (self.demand_is_met, self._demand, self._coverage)
+        )
 
     @property
     def is_optimal(self):

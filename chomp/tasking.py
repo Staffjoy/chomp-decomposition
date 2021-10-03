@@ -12,7 +12,7 @@ from chomp.helpers import week_day_range, normalize_to_midnight
 from chomp import config, logger, Splitter
 
 
-class Tasking():
+class Tasking:
     """Get tasks and process them"""
 
     REQUEUE_STATE = "chomp-queue"
@@ -49,8 +49,8 @@ class Tasking():
                     previous_request_failed = True
                 else:
                     logger.error(
-                        "Unable to fetch chomp task after previous failure: %s",
-                        e)
+                        "Unable to fetch chomp task after previous failure: %s", e
+                    )
 
                 # Still sleep so we avoid thundering herd
                 sleep(config.TASKING_FETCH_INTERVAL_SECONDS)
@@ -61,12 +61,14 @@ class Tasking():
                 task.delete()
                 logger.info("Task completed %s", task.data)
             except Exception as e:
-                logger.error("Failed schedule %s:  %s %s",
-                             task.data.get("schedule_id"), e,
-                             traceback.format_exc())
+                logger.error(
+                    "Failed schedule %s:  %s %s",
+                    task.data.get("schedule_id"),
+                    e,
+                    traceback.format_exc(),
+                )
 
-                logger.info("Requeuing schedule %s",
-                            task.data.get("schedule_id"))
+                logger.info("Requeuing schedule %s", task.data.get("schedule_id"))
                 # self.sched set in process_task
                 self.sched.patch(state=self.REQUEUE_STATE)
 
@@ -79,8 +81,7 @@ class Tasking():
 
     def _process_task(self, task):
         # 1. Fetch schedule
-        self.org = self.client.get_organization(
-            task.data.get("organization_id"))
+        self.org = self.client.get_organization(task.data.get("organization_id"))
         self.loc = self.org.get_location(task.data.get("location_id"))
         self.role = self.loc.get_role(task.data.get("role_id"))
         self.sched = self.role.get_schedule(task.data.get("schedule_id"))
@@ -89,9 +90,11 @@ class Tasking():
         self._subtract_existing_shifts_from_demand()
 
         # Run the  calculation
-        s = Splitter(self.demand,
-                     self.sched.data.get("min_shift_length_hour"),
-                     self.sched.data.get("max_shift_length_hour"))
+        s = Splitter(
+            self.demand,
+            self.sched.data.get("min_shift_length_hour"),
+            self.sched.data.get("max_shift_length_hour"),
+        )
         s.calculate()
         s.efficiency()
 
@@ -109,7 +112,8 @@ class Tasking():
             logger.debug("Processing shift %s", shift)
 
             start_day = normalize_to_midnight(
-                deepcopy(local_start_time) + timedelta(days=shift["day"]))
+                deepcopy(local_start_time) + timedelta(days=shift["day"])
+            )
 
             # Beware of time changes - duplicate times are possible
             try:
@@ -130,12 +134,15 @@ class Tasking():
     def _subtract_existing_shifts_from_demand(self):
         logger.info("Starting demand: %s", self.demand)
         demand_copy = deepcopy(self.demand)
-        search_start = (self._get_local_start_time() - timedelta(
-            hours=config.MAX_SHIFT_LENGTH_HOURS)).astimezone(self.default_tz)
+        search_start = (
+            self._get_local_start_time()
+            - timedelta(hours=config.MAX_SHIFT_LENGTH_HOURS)
+        ).astimezone(self.default_tz)
         # 1 week
-        search_end = (self._get_local_start_time() + timedelta(
-            days=7, hours=config.MAX_SHIFT_LENGTH_HOURS)
-                      ).astimezone(self.default_tz)
+        search_end = (
+            self._get_local_start_time()
+            + timedelta(days=7, hours=config.MAX_SHIFT_LENGTH_HOURS)
+        ).astimezone(self.default_tz)
 
         shifts = self.role.get_shifts(start=search_start, end=search_end)
 
@@ -143,8 +150,9 @@ class Tasking():
 
         # Search hour by hour throughout the weeks
         for day in range(len(self.demand)):
-            start_day = normalize_to_midnight(self._get_local_start_time() +
-                                              timedelta(days=day))
+            start_day = normalize_to_midnight(
+                self._get_local_start_time() + timedelta(days=day)
+            )
             for start in range(len(self.demand[0])):
 
                 # Beware of time changes - duplicate times are possible
@@ -152,8 +160,7 @@ class Tasking():
                     start_hour = deepcopy(start_day).replace(hour=start)
                 except pytz.AmbiguousTimeError:
                     # Randomly pick one - cause phucket. Welcome to chomp.
-                    start_hour = deepcopy(start_day).replace(
-                        hour=start, is_dst=False)
+                    start_hour = deepcopy(start_day).replace(hour=start, is_dst=False)
 
                 try:
                     stop_hour = start_hour + timedelta(hours=1)
@@ -163,23 +170,28 @@ class Tasking():
                 # Find shift
                 current_staffing_level = 0
                 for shift in shifts:
-                    shift_start = iso8601.parse_date(
-                        shift.data.get("start")).replace(
-                            tzinfo=self.default_tz)
-                    shift_stop = iso8601.parse_date(
-                        shift.data.get("stop")).replace(tzinfo=self.default_tz)
+                    shift_start = iso8601.parse_date(shift.data.get("start")).replace(
+                        tzinfo=self.default_tz
+                    )
+                    shift_stop = iso8601.parse_date(shift.data.get("stop")).replace(
+                        tzinfo=self.default_tz
+                    )
 
-                    if ((shift_start <= start_hour and shift_stop > stop_hour)
-                            or
-                        (shift_start >= start_hour and shift_start < stop_hour)
-                            or
-                        (shift_stop > start_hour and shift_stop <= stop_hour)):
+                    if (
+                        (shift_start <= start_hour and shift_stop > stop_hour)
+                        or (shift_start >= start_hour and shift_start < stop_hour)
+                        or (shift_stop > start_hour and shift_stop <= stop_hour)
+                    ):
 
                         # increment staffing level during that bucket
                         current_staffing_level += 1
 
-                logger.debug("Current staffing level at day %s time %s is %s",
-                             day, start, current_staffing_level)
+                logger.debug(
+                    "Current staffing level at day %s time %s is %s",
+                    day,
+                    start,
+                    current_staffing_level,
+                )
 
                 demand_copy[day][start] -= current_staffing_level
                 # demand cannot be less than zero
@@ -192,8 +204,9 @@ class Tasking():
     def _get_local_start_time(self):
         # Create the datetimes
         local_tz = pytz.timezone(self.loc.data.get("timezone"))
-        utc_start_time = iso8601.parse_date(
-            self.sched.data.get("start")).replace(tzinfo=self.default_tz)
+        utc_start_time = iso8601.parse_date(self.sched.data.get("start")).replace(
+            tzinfo=self.default_tz
+        )
         local_start_time = utc_start_time.astimezone(local_tz)
         return local_start_time
 

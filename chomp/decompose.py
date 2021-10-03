@@ -49,8 +49,7 @@ class Decompose:
                 demand[t] = peak
 
         peak = 0
-        for t in reversed(
-                range((len(demand) - self.min_length - 1), len(demand))):
+        for t in reversed(range((len(demand) - self.min_length - 1), len(demand))):
             if demand[t] > peak:
                 peak = demand[t]
             elif demand[t] < peak:
@@ -105,7 +104,10 @@ class Decompose:
             if sum_demand[t] < expected_demand[t]:
                 logger.error(
                     "Demand not met at time %s (demand %s, supply %s)",
-                    t + self.window_offset, expected_demand[t], sum_demand[t])
+                    t + self.window_offset,
+                    expected_demand[t],
+                    sum_demand[t],
+                )
                 raise Exception("Demand not met at time %s" % t)
         return True
 
@@ -114,8 +116,9 @@ class Decompose:
         if shifts is None:
             shifts = self._shifts
 
-        efficiency = (1.0 * sum(shift["length"]
-                                for shift in shifts) / sum(self.demand)) - 1
+        efficiency = (
+            1.0 * sum(shift["length"] for shift in shifts) / sum(self.demand)
+        ) - 1
 
         return efficiency
 
@@ -124,7 +127,8 @@ class Decompose:
             demand=self.demand,
             min_length=self.min_length,
             max_length=self.max_length,
-            shifts=self._shifts)
+            shifts=self._shifts,
+        )
 
     def calculate(self):
         if len(self._shifts) > 0:
@@ -133,9 +137,8 @@ class Decompose:
         # Try checking cache. Putting the check here means it even works for
         # subproblems!
         cached_shifts = cache.get(
-            demand=self.demand,
-            min_length=self.min_length,
-            max_length=self.max_length)
+            demand=self.demand, min_length=self.min_length, max_length=self.max_length
+        )
         if cached_shifts:
             logger.info("Hit cache")
             self._shifts = cached_shifts
@@ -145,8 +148,11 @@ class Decompose:
         demand_sum = sum(self.demand)
         if demand_sum > config.BIFURCATION_THRESHHOLD:
             # Subproblems. Split into round up and round down.
-            logger.info("Initiating split (demand sum %s, threshhold %s)",
-                        demand_sum, config.BIFURCATION_THRESHHOLD)
+            logger.info(
+                "Initiating split (demand sum %s, threshhold %s)",
+                demand_sum,
+                config.BIFURCATION_THRESHHOLD,
+            )
             # Show parent demand sum becuase it can recursively split
             demand_up = self._split_demand(round_up=True)
             demand_low = self._split_demand(round_up=False)
@@ -155,13 +161,13 @@ class Decompose:
             d_low = Decompose(demand_low, self.min_length, self.max_length)
 
             logger.info(
-                "Beginning upper round subproblem (parent demand sum: %s)",
-                demand_sum)
+                "Beginning upper round subproblem (parent demand sum: %s)", demand_sum
+            )
             d_up.calculate()
 
             logger.info(
-                "Beginning lower round subproblem (parent demand sum: %s)",
-                demand_sum)
+                "Beginning lower round subproblem (parent demand sum: %s)", demand_sum
+            )
             d_low.calculate()
 
             self._shifts.extend(d_up.get_shifts())
@@ -184,11 +190,14 @@ class Decompose:
         best_known_solution = starting_solution
         best_possible_solution = sum(self.demand)
 
-        logger.debug("Starting with known coverage %s vs best possible %s",
-                     best_known_coverage, best_possible_solution)
+        logger.debug(
+            "Starting with known coverage %s vs best possible %s",
+            best_known_coverage,
+            best_possible_solution,
+        )
 
         # Branches to search
-        # (We want shortest shifts retrieved first, so 
+        # (We want shortest shifts retrieved first, so
         # we add shortest and pop() to git last in)
         # (a LIFO queue using pop is more efficient in python
         # than a FIFO queue using pop(0))
@@ -197,16 +206,21 @@ class Decompose:
 
         logger.info("Demand: %s", self.demand)
         empty_collection = ShiftCollection(
-            self.min_length, self.max_length, demand=self.demand)
+            self.min_length, self.max_length, demand=self.demand
+        )
         stack.append(empty_collection)
 
         start_time = datetime.utcnow()
 
         while len(stack) != 0:
-            if start_time + timedelta(
-                    seconds=config.CALCULATION_TIMEOUT) < datetime.utcnow():
-                logger.info("Exited due to timeout (%s seconds)",
-                            (datetime.utcnow() - start_time).total_seconds())
+            if (
+                start_time + timedelta(seconds=config.CALCULATION_TIMEOUT)
+                < datetime.utcnow()
+            ):
+                logger.info(
+                    "Exited due to timeout (%s seconds)",
+                    (datetime.utcnow() - start_time).total_seconds(),
+                )
                 break
 
             # Get a branch
@@ -222,8 +236,10 @@ class Decompose:
                 if working_collection.coverage_sum < best_known_coverage:
                     logger.info(
                         "Better solution found (previous coverage %s / new coverage %s / best_possible %s)",
-                        best_known_coverage, working_collection.coverage_sum,
-                        best_possible_solution)
+                        best_known_coverage,
+                        working_collection.coverage_sum,
+                        best_possible_solution,
+                    )
 
                     # Set new best possible solution
                     best_known_solution = working_collection
@@ -242,8 +258,9 @@ class Decompose:
 
                     # Get shift start time
                     start = t
-                    for length in reverse_inclusive_range(self.min_length,
-                                                          self.max_length):
+                    for length in reverse_inclusive_range(
+                        self.min_length, self.max_length
+                    ):
                         # Make sure we aren't off edge
                         end_index = start + length
 
@@ -256,7 +273,10 @@ class Decompose:
                             if new_collection.demand_is_met:
                                 new_collection.anneal()
 
-                            if new_collection.best_possible_coverage < best_known_coverage:
+                            if (
+                                new_collection.best_possible_coverage
+                                < best_known_coverage
+                            ):
 
                                 # Only save it if it's an improvement
                                 stack.append(new_collection)
@@ -270,7 +290,8 @@ class Decompose:
         # Heuristic: Fill in only shifts of smallest shift len
 
         collection = ShiftCollection(
-            self.min_length, self.max_length, demand=self.demand)
+            self.min_length, self.max_length, demand=self.demand
+        )
 
         # Add shifts for the end
 
@@ -307,8 +328,10 @@ class Decompose:
         # external shifts model
         for shift in collection.shifts:
             start, length = shift
-            self._shifts.append({
-                "start": start,
-                "length": length,
-            })
+            self._shifts.append(
+                {
+                    "start": start,
+                    "length": length,
+                }
+            )
         self._set_cache()

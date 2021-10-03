@@ -41,9 +41,7 @@ class Splitter(object):
                 raise UnequalDayLengthException()
 
         # 2) Flatten demand
-        self.flat_demand = [
-            item for day_demand in week_demand for item in day_demand
-        ]
+        self.flat_demand = [item for day_demand in week_demand for item in day_demand]
 
     def calculate(self):
         # Generate subproblems
@@ -76,13 +74,13 @@ class Splitter(object):
         # Stop condition is based on start becuase of circular wraping
         for start in range(len(self.flat_demand)):
             if (self.flat_demand[start] is not 0) and (
-                    start is 0 or self.flat_demand[start - 1] is 0):
-                for end in range(start + 1,
-                                 len(self.flat_demand) + self.max_length):
+                start is 0 or self.flat_demand[start - 1] is 0
+            ):
+                for end in range(start + 1, len(self.flat_demand) + self.max_length):
 
                     if self._get_flat_demand(end) is 0 and (
-                            start == (end - 1) or
-                            self._get_flat_demand(end - 1) is not 0):
+                        start == (end - 1) or self._get_flat_demand(end - 1) is not 0
+                    ):
                         # Add to window . . . mayb
                         # off by 1 becuase of exclusive
                         self._add_window(start, end)
@@ -104,8 +102,7 @@ class Splitter(object):
 
             if start == 0:
                 # Expected
-                logger.debug(
-                    "Skipping circular wraparound at beginning of loop")
+                logger.debug("Skipping circular wraparound at beginning of loop")
             else:
                 # Bad user. Bad.
                 logger.info("Skipping window less than min length")
@@ -132,17 +129,20 @@ class Splitter(object):
         window_count = 0
         for (start, stop) in self._windows:
             window_count += 1
-            logger.info("Starting window %s of %s (start %s stop %s) ",
-                        window_count, len(self._windows), start, stop)
+            logger.info(
+                "Starting window %s of %s (start %s stop %s) ",
+                window_count,
+                len(self._windows),
+                start,
+                stop,
+            )
 
             # Need to wrap
             demand = self._get_window_demand(start, stop)
-            d = Decompose(
-                demand, self.min_length, self.max_length, window_offset=start)
+            d = Decompose(demand, self.min_length, self.max_length, window_offset=start)
             d.calculate()
             e = d.efficiency()
-            logger.info("Window efficiency: Overage is %s percent",
-                        (e * 100.0))
+            logger.info("Window efficiency: Overage is %s percent", (e * 100.0))
             self._shifts.extend(d.get_shifts())
 
     #
@@ -209,8 +209,11 @@ class Splitter(object):
         for t in range(len(expected_demand)):
             if sum_demand[t] < expected_demand[t]:
                 logger.error(
-                    "Demand not met at time %s (demand %s, supply %s)", t,
-                    expected_demand[t], sum_demand[t])
+                    "Demand not met at time %s (demand %s, supply %s)",
+                    t,
+                    expected_demand[t],
+                    sum_demand[t],
+                )
                 raise Exception("Demand not met at time %s" % t)
         return True
 
@@ -222,8 +225,9 @@ class Splitter(object):
         if sum(self.flat_demand) == 0.0:
             return PERFECT_OPTIMALITY
 
-        efficiency = (1.0 * sum(shift["length"] for shift in self._shifts) /
-                      sum(self.flat_demand)) - 1
+        efficiency = (
+            1.0 * sum(shift["length"] for shift in self._shifts) / sum(self.flat_demand)
+        ) - 1
 
         logger.info("Efficiency: Overage is %s percent", efficiency * 100.0)
         return efficiency
@@ -232,5 +236,6 @@ class Splitter(object):
         """Get circular start and stop (stop may wrap)"""
         if stop < len(self.flat_demand):
             return self.flat_demand[start:stop]
-        return self.flat_demand[start:] + self.flat_demand[:stop % len(
-            self.flat_demand)]
+        return (
+            self.flat_demand[start:] + self.flat_demand[: stop % len(self.flat_demand)]
+        )

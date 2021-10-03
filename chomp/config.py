@@ -15,12 +15,17 @@ class DefaultConfig:
 
     # Scheduling constants
     DAYS_OF_WEEK = [
-        "monday", "tuesday", "wednesday", "thursday", "friday", "saturday",
-        "sunday"
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
     ]
 
-    MEMCACHED_CONFIG = ['127.0.0.1:11211'
-                        ]  # Localhost. May centralize in future.
+    MEMCACHED_CONFIG = [os.environ.get("MEMCACHE_HOST", "127.0.0.1:11211")]
+
 
     TASKING_FETCH_INTERVAL_SECONDS = 20
     STAFFJOY_API_KEY = os.environ.get("STAFFJOY_API_KEY")

@@ -1,0 +1,36 @@
+name: orderin-ml-actions
+
+on: [push]
+
+jobs:
+  pypi-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout repo
+      uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-west-1
+    - name: Add public IP to AWS security group
+      run: |
+        AWS_EC2_METADATA_DISABLED=true aws ec2 authorize-security-group-ingress \
+          --group-id sg-017f73fa426d391d5 \
+          --ip-permissions IpProtocol=tcp,FromPort=1000,ToPort=9999,IpRanges="[{CidrIp=$(curl ident.me)/32, Description=orderin-ml-github}]"
+    - name: build wheel package
+      run: |
+        pip install wheel
+        pip install twine
+        python setup.py build
+        python setup.py sdist bdist_wheel
+  
+    - name: upload package to pypi
+      if: endsWith(github.ref, '/main')
+      run: |
+        twine upload --repository-url http://ops.datascience.orderin.co.za:9000 dist/* --password admin --username admin --skip-existing
